@@ -1,31 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Car, Calendar, Heart, CreditCard, MessageSquare, Bell, LogOut, Menu, X, Search, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { VscLayoutSidebarRight } from "react-icons/vsc";
+import { VscLayoutSidebarLeft } from "react-icons/vsc";
 import { useCarFilters } from '../context/FilterContext';
 import tataLogo from '../assets/logo/tata.png';
 import porsheLogo from '../assets/logo/por.png';
-
-const clientMenuItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, active: true },
-  { label: 'Buy Cars', icon: Car },
-  { label: 'My Rentals', icon: Calendar },
-  { label: 'Wishlist', icon: Heart },
-  { label: 'Payments', icon: CreditCard },
-  { label: 'Messages', icon: MessageSquare },
-];
 
 export default function ClientLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const searchInputRef = useRef(null);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     selectedBrand, setSelectedBrand,
     searchCarName, setSearchCarName,
     budgetRange, setBudgetRange
   } = useCarFilters();
+
+  // Flag tracker: Check if filters belong to current view domain path
+  const isMarketplaceActive = location.pathname === '/client/buy';
+
+  const clientMenuItems = [
+    { label: 'Dashboard', icon: LayoutDashboard, path: '/client/dashboard' },
+    { label: 'Buy/Rent Cars', icon: Car, path: '/client/buy' },
+    { label: 'My Rentals', icon: Calendar, path: '/client/rentals' },
+    { label: 'Wishlist', icon: Heart, path: '/client/wishlist' },
+    { label: 'Payments', icon: CreditCard, path: '/client/payments' },
+    { label: 'Messages', icon: MessageSquare, path: '/client/messages' },
+  ];
 
   const filterBrands = [
     { name: 'ALL', label: 'All Brands' },
@@ -36,7 +44,7 @@ export default function ClientLayout({ children }) {
     { name: 'TATA', label: 'Tata', img: tataLogo }
   ];
 
-  const dynamicPlaceholders = ["Search Porsche...", "Search BMW...", "Search Tesla...", "Search Variants..."];
+  const dynamicPlaceholders = [" Porsche", " BMW", " Tesla", " Variants"];
 
   useEffect(() => {
     const placeholderTimer = setInterval(() => {
@@ -45,7 +53,6 @@ export default function ClientLayout({ children }) {
     return () => clearInterval(placeholderTimer);
   }, [dynamicPlaceholders.length]);
 
-  // Handle Ctrl+K / ⌘K global focus handler binding
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -60,25 +67,37 @@ export default function ClientLayout({ children }) {
   return (
     <div className="min-h-screen bg-carnetBg text-slate-800 dark:text-slate-100 flex select-none antialiased transition-colors duration-300">
       
-      {/* ================= SIDEBAR WITH CLEAN NORMAL FONTS & INTELLIGENT HOOKS ================= */}
+      {/* ================= SIDEBAR CONSOLE SYSTEM TERMINAL ================= */}
       <aside className={`glass-panel fixed left-0 top-0 bottom-0 h-full z-40 transition-all duration-300 ease-out flex flex-col justify-between overflow-y-auto ${sidebarOpen ? 'w-72' : 'w-20'} bg-white dark:bg-[#071426]/95 border-r border-slate-200 dark:border-white/5 shadow-xl`}>
         <div>
           {/* Header Area */}
           <div className={`h-20 flex items-center border-b border-slate-100 dark:border-white/5 ${sidebarOpen ? 'justify-between px-6' : 'justify-center px-0'}`}>
             <span className={`text-lg font-bold text-slate-900 dark:text-white tracking-wide transition-all duration-300 ${sidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 absolute pointer-events-none'}`}>
-              CarNet<span className="text-primaryBlue font-medium">.client</span>
+              CARNET<span className="text-primaryBlue font-medium">.COM</span>
             </span>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0">
-              {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
+              {sidebarOpen ? <VscLayoutSidebarRight size={16} /> : <VscLayoutSidebarLeft size={16} />}
             </button>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation Matrix Link Actions */}
           <nav className="p-4 space-y-1 border-b border-slate-100 dark:border-white/5">
             {clientMenuItems.map((item, idx) => {
               const Icon = item.icon;
+              const isLinkActive = location.pathname === item.path;
               return (
-                <button key={idx} className={`w-full flex items-center rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 ${sidebarOpen ? 'gap-4 px-4 py-2.5 justify-start' : 'px-0 py-2.5 justify-center'} ${item.active ? 'bg-primaryBlue text-white shadow-sm' : 'text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] hover:text-slate-900'}`}>
+                <button 
+                  key={idx} 
+                  type="button"
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 ${
+                    sidebarOpen ? 'gap-4 px-4 py-2.5 justify-start' : 'px-0 py-2.5 justify-center'
+                  } ${
+                    isLinkActive 
+                      ? 'bg-primaryBlue text-white shadow-sm' 
+                      : 'text-slate-500 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-white/[0.03] hover:text-slate-900'
+                  }`}
+                >
                   <Icon size={16} className="shrink-0" />
                   <span className={`${sidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 absolute pointer-events-none'}`}>{item.label}</span>
                 </button>
@@ -86,10 +105,15 @@ export default function ClientLayout({ children }) {
             })}
           </nav>
 
-          {/* Clean Functional Filter Controls Layout Container */}
+          {/* Clean Functional Filter Controls Layout Container — RENDERS CONDITIONALLY ONLY */}
           <AnimatePresence>
-            {sidebarOpen && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-5 space-y-5 text-xs font-normal">
+            {sidebarOpen && isMarketplaceActive && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }} 
+                animate={{ opacity: 1, height: 'auto' }} 
+                exit={{ opacity: 0, height: 0 }}
+                className="p-5 space-y-5 text-xs font-normal border-b border-slate-100 dark:border-white/5"
+              >
                 <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 font-medium tracking-wide border-b border-slate-100 dark:border-white/5 pb-2">
                   <SlidersHorizontal size={14} className="text-primaryBlue" />
                   <span>Filter Options</span>
@@ -102,6 +126,7 @@ export default function ClientLayout({ children }) {
                     {filterBrands.map((brand) => (
                       <button
                         key={brand.name}
+                        type="button"
                         onClick={() => setSelectedBrand(brand.name)}
                         className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                           selectedBrand === brand.name
@@ -137,17 +162,17 @@ export default function ClientLayout({ children }) {
 
         {/* Bottom Signout Area */}
         <div className="p-4 border-t border-slate-100 dark:border-white/5">
-          <button className={`w-full flex items-center rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-all duration-200 ${sidebarOpen ? 'gap-4 px-4 py-2.5 justify-start' : 'px-0 py-2.5 justify-center'}`}>
+          <button onClick={() => navigate('/')} className={`w-full flex items-center rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-all duration-200 ${sidebarOpen ? 'gap-4 px-4 py-2.5 justify-start' : 'px-0 py-2.5 justify-center'}`}>
             <LogOut size={16} className="shrink-0" />
             <span className={`${sidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 absolute pointer-events-none'}`}>Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* ================= CONTENT MAIN VIEWPORT ================= */}
+      {/* ================= CONTENT MAIN VIEWPORT WRAPPER ================= */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ease-out min-w-0 ${sidebarOpen ? 'pl-72' : 'pl-20'}`}>
         
-        {/* Upper Dynamic Navbar Area with Absolute Centered Search Engine Drop */}
+        {/* Upper Dynamic Navbar Area with Center Search Engine Module */}
         <header className="h-20 glass-panel border-x-0 border-t-0 px-8 grid grid-cols-3 items-center sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-[#071426]/60 border-b border-slate-200 dark:border-white/5">
           <div />
           

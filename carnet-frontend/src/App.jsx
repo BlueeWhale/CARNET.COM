@@ -15,9 +15,18 @@ import OtpVerification from './pages/public/OtpVerification';
 import ClientLayout from './layouts/ClientLayout';
 import DealerLayout from './layouts/DealerLayout';
 
-// CRITICAL FIX IMPORT: Filter Provider Context System Engine
+// Core State Providers Matrix Import
 import { FilterProvider } from './context/FilterContext';
+import { RentalProvider } from './context/RentalContext';
+import { WishlistProvider } from './context/WishlistContext'; // CRITICAL FIX IMPORT
+
+// Pages Components
 import ClientDashboardHome from './components/dashboard/ClientDashboardHome';
+import FleetMarket from './pages/client/FleetMarket';
+import VehicleDetails from './pages/client/VehicleDetails';
+import RentalDetails from './pages/client/RentalDetails';
+import MyRentals from './pages/client/MyRentals';
+import MyWishlist from './pages/client/MyWishlist'; // Wishlist Screen Link
 
 export default function App() {
   const [cinematicActive, setCinematicActive] = useState(true);
@@ -40,38 +49,68 @@ export default function App() {
           {cinematicActive ? (
             <IntroScreen key="aaa_cinematic" onComplete={() => setCinematicActive(false)} />
           ) : (
-            /* FIX LAYER: Wrap the entire routing context matrix inside the state filter provider */
+            /* CONFIGURATION PIPELINE: Wrapping all global state layers seamlessly */
             <FilterProvider>
-              <Router key="app_routing_canvas">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/verify-otp" element={<OtpVerification />} />
+              <RentalProvider>
+                <WishlistProvider> {/* FIX LAYER BOUND HERE */}
+                  <Router key="app_routing_canvas">
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/verify-otp" element={<OtpVerification />} />
 
-                  {/* Client Layout with Clean Non-Duplicated Dashboard Framework */}
-                  <Route path="/client/dashboard" element={
-                    <ClientLayout>
-                      {/* 
-                        FIX: Duplicate hardcoded metrics boxes aur duplicate <CarMarketGrid /> ko yahan se saaf kar diya hai.
-                        Ab ClientDashboardHome hi akele responsive automatic photo banner, clean metrics aur operational grids ko handle karega.
-                      */}
-                      <ClientDashboardHome />
-                    </ClientLayout>
-                  } />
+                      {/* Client Layout with Full Ecosystem Dashboard Framework */}
+                      <Route path="/client/dashboard" element={
+                        <ClientLayout>
+                          <ClientDashboardHome />
+                        </ClientLayout>
+                      } />
 
-                  <Route path="/dealer/dashboard" element={
-                    <DealerLayout>
-                      <div className="glass-panel p-8 rounded-2xl border border-dashed border-white/10 flex text-center py-16 justify-center">
-                        <p className="text-gray-400 text-sm max-w-md tracking-wide">Dealer Terminal Active Node.</p>
-                      </div>
-                    </DealerLayout>
-                  } />
+                      <Route path="/client/buy" element={
+                        <ClientLayout>
+                          <FleetMarket />
+                        </ClientLayout>
+                      } />
 
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </Router>
+                      <Route path="/client/vehicle-details" element={
+                        <ClientLayout>
+                          <VehicleDetails />
+                        </ClientLayout>
+                      } />
+
+                      <Route path="/client/rental-details" element={
+                        <ClientLayout>
+                          <RentalDetails />
+                        </ClientLayout>
+                      } />
+
+                      <Route path="/client/rentals" element={
+                        <ClientLayout>
+                          <MyRentals />
+                        </ClientLayout>
+                      } />
+
+                      <Route path="/client/wishlist" element={
+                        <ClientLayout>
+                          <MyWishlist />
+                        </ClientLayout>
+                      } />
+
+                      <Route path="/dealer/dashboard" element={
+                        <DealerLayout>
+                          <div className="glass-panel p-8 rounded-2xl border border-dashed border-white/10 flex text-center py-16 justify-center">
+                            <p className="text-gray-400 text-sm max-w-md tracking-wide">Dealer Terminal Active Node.</p>
+                          </div>
+                        </DealerLayout>
+                      } />
+
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Router>
+                </WishlistProvider>
+              </RentalProvider>
             </FilterProvider>
           )}
         </AnimatePresence>

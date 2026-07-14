@@ -143,8 +143,13 @@ export default function CarMarketGrid() {
                     </div>
                   </div>
                 </div>
-
-               
+<button
+                  type="button"
+                  onClick={() => handlePurchaseInit(car.name)}
+                  className="w-full py-2 bg-primaryBlue text-white text-xs font-bold rounded-xl transition-all hover:bg-primaryBlue/90 active:scale-95"
+                >
+                  CHECK CAR 
+                </button>                
               </div>
             </motion.div>
           ))}
